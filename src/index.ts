@@ -2,37 +2,68 @@
 import { $query, $update, Record, StableBTreeMap, Vec, match, Result, nat64, ic, Opt } from 'azle';
 import { v4 as uuidv4 } from 'uuid';
 
-type message = record<{
+type patient = record<{
     id: string;
-    title: string;
-    body: string;
-    attachmentURL: string;
-    createdAt: nat64;
-    updatedAt:opt<natb4>;
+    name: string;
+    age: nat64;
+    createdTime: nat64;
+    updatedTime:opt<natb4>;
 }>
-type massagePayload = record<{
-    title: string;
-    body: string;
-    attachmentURL: string;
+type appointment = record<{
+    id: string;
+    dept: string;
+    physician_name: string;
+    time: nat64;
+    createdTime: nat64;
+    updatedTime: nat64;
 }>
-const messageStorage = new StableBTreeMap<string, Message>(0, 44, 1024);
+type cashout = record<{
+    id: string;
+    name: string;
+    payout: string;
+    createdTime: nat64;
+    updatedTime: nat64;
+}>
+type appointmentPayload = record<{
+    dept: string;
+    physician_name: string;
+}>
+type cashoutPayload = record<{
+    name: string;
+    payout: string;
+}>
+//creating instances for stableBTreeMaps
+const patientStorage = new StableBTreeMap<string, patient>(0, 42, 500);
+const appointmentStorage = new StableBTreeMap<string, appointment>(1, 42, 500);
+const cashoutStorage = new StableBTreeMap<string, cashout>(2, 42, 500);
 
-$query;
-export function getMessages(): Result<vec<Message>, string>{
-    return Result.Ok(messageStorage.values());
+//initializing patientstorage
+$update;
+export function patient(name: string): string{
+    if(!patientStorage.isEmpty()){
+        return 'patient record is up to date'
+    }
+    const message: Message = {
+        id: uuidv4(), 
+        createdAt: ic.time(), 
+        updatedAt: Opt.None, 
+    };
+    patientStorage.insert(patient.id, patient);
+  return patient.id;
 }
 $query;
-export function getMessage(id: string): Result<Message, string> {
-    return match(messageStorage.get(id), {
-        Some: (message) => Result.Ok<Message, string>(message),
-        None: () => Result.Err<Message, string>(`a message with id=${id} not found`)
-    });
+export function getappointmenttime(id: string): Result<appointment, string> {
+    const time = appointmentStorage.values().filter((time) => !time.isOccupied);
+    if (time.length == 0){
+        return Result.Err("no physicians available at the time")
+    }
+    return Result.Ok(time);
 }
 $update;
-export function addMessage(payload: MessagePayload): Result<Message, string> {
-    const message: Message = { id: uuidv4(), createdAt: ic.time(), updatedAt: Opt.None, ...payload };
-    messageStorage.insert(message.id, message);
-    return Result.Ok(message);
+export function addappointment(payload: appointmentPayload):  string{
+    if (patientstorage.isEmpty()){
+        patient("In session")
+    }
 }
 $update;
 export function updateMessage(id: string, payload: MessagePayload): Result<Message, string> {
