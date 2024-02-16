@@ -1,7 +1,8 @@
 // cannister code goes here
+//importing the azle and uuid libraries
 import { $query, $update, Record, StableBTreeMap, Vec, match, Result, nat64, ic, Opt } from 'azle';
 import { v4 as uuidv4 } from 'uuid';
-
+//defining the record typesfor the entities
 type patient = record<{
     id: string;
     name: string;
@@ -38,7 +39,7 @@ const patientStorage = new StableBTreeMap<string, patient>(0, 42, 500);
 const appointmentStorage = new StableBTreeMap<string, appointment>(1, 42, 500);
 const cashoutStorage = new StableBTreeMap<string, cashout>(2, 42, 500);
 
-//initializing patientstorage
+//initializing and quering the functions
 $update;
 export function patient(name: string): string{
     if(!patientStorage.isEmpty()){
