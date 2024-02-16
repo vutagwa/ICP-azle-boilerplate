@@ -20,6 +20,7 @@ type appointment = record<{
 type cashout = record<{
     id: string;
     name: string;
+    sercive_id: string;
     payout: string;
     createdTime: nat64;
     updatedTime: nat64;
@@ -84,6 +85,18 @@ export function deleteappointment(id: string): Result<appointment, string> {
         None: () => Result.Err<appointment, string>(`couldn't delete a patient appointment with id=${id}. appointment not found.`)
     });
 }
+$update
+export function pricing(payload: cashoutPayload): string{
+    const price = payment(payload.appointment_serviceid).price;
+    const cashout = {
+        id: uuidv4();
+        name: string;
+        created_date: ic.time(),
+        updated_at: Opt.None,
+    };
+    cashoutStorage.insert(cashout.id, cashout);
+    return ` new total cost: \$${price + 5}`;
+  }
 //crypto for object testing
 globalThis.crypto = {
     // @ts-ignore
