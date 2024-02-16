@@ -43,8 +43,9 @@ export function patient(name: string): string{
     if(!patientStorage.isEmpty()){
         return 'patient record is up to date'
     }
-    const message: Message = {
+    const patient = {
         id: uuidv4(), 
+        name: name;
         createdAt: ic.time(), 
         updatedAt: Opt.None, 
     };
@@ -66,23 +67,24 @@ export function addappointment(payload: appointmentPayload):  string{
     }
 }
 $update;
-export function updateMessage(id: string, payload: MessagePayload): Result<Message, string> {
-    return match(messageStorage.get(id), {
-        Some: (message) => {
-            const updatedMessage: Message = {...message, ...payload, updatedAt: Opt.Some(ic.time())};
-            messageStorage.insert(message.id, updatedMessage);
-            return Result.Ok<Message, string>(updatedMessage);
+export function updateappointment(id: string, payload: appointmentPayload): Result<appointment, string> {
+    return match(appointmentStorage.get(id), {
+        Some: (appointment) => {
+            const updatedAppointment: appointment = {...appointment, ...payload, updatedAt: Opt.Some(ic.time())};
+            appointmentStorage.insert(appointment.id, updatedAppointment);
+            return Result.Ok<appointment, string>(updatedAppointment);
         },
-        None: () => Result.Err<Message, string>(`couldn't update a message with id=${id}. message not found`)
+        None: () => Result.Err<appointment, string>(`couldn't update a patient appointment with id=${id}.appointment not found`)
     });
 }
 $update;
-export function deleteMessage(id: string): Result<Message, string> {
-    return match(messageStorage.remove(id), {
-        Some: (deletedMessage) => Result.Ok<Message, string>(deletedMessage),
-        None: () => Result.Err<Message, string>(`couldn't delete a message with id=${id}. message not found.`)
+export function deleteappointment(id: string): Result<appointment, string> {
+    return match(appointmentStorage.remove(id), {
+        Some: (deletedAppointment) => Result.Ok<appointment, string>(deletedAppointment),
+        None: () => Result.Err<appointment, string>(`couldn't delete a patient appointment with id=${id}. appointment not found.`)
     });
-}// a workaround to make uuid package work with Azle
+}
+//crypto for object testing
 globalThis.crypto = {
     // @ts-ignore
    getRandomValues: () => {
